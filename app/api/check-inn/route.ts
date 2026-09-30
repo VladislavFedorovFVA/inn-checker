@@ -1,4 +1,10 @@
 import { NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export async function POST(request: Request) {
   const { inn } = await request.json()
@@ -56,6 +62,15 @@ export async function POST(request: Request) {
     BANKRUPT: 'Банкрот',
   }
 
+  // Ищем долг в таблице, залитой из данных ФНС
+  const { data: debtRow } = await supabase
+    .from('tax_debts')
+    .select('debt_amount')
+    .eq('inn', inn)
+    .maybeSingle()
+
+  const taxDebt = debtRow?.debt_amount ?? 0
+
   return NextResponse.json({
     inn,
     ogrn: d.ogrn ?? null,
@@ -71,6 +86,6 @@ export async function POST(request: Request) {
     address: d.address?.value ?? null,
     okved: d.okved ?? null,
     capital: d.capital?.value ?? null,
-    finance_debt: d.finance?.debt ?? null,
+    tax_debt: taxDebt,  // ← новое поле
   })
 }

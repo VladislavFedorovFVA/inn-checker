@@ -19,6 +19,7 @@ type Report = {
   address: string | null
   okved: string | null
   capital: number | null
+  tax_debt: number  
 }
 
 export default function CheckPage() {
@@ -131,6 +132,19 @@ export default function CheckPage() {
           </div>
 
           <div className="mt-8 pt-6 border-t space-y-3 text-sm">
+                      <div className="flex items-start gap-3">
+              <span className="text-lg">
+                {report.tax_debt > 0 ? '🔴' : '🟢'}
+              </span>
+              <div>
+                <p className="font-medium">
+                  {report.tax_debt > 0
+                    ? `Задолженность по налогам: ${report.tax_debt.toLocaleString('ru-RU')} ₽`
+                    : 'Задолженность по налогам отсутствует'}
+                </p>
+              </div>
+            </div>
+            
             <div className="flex items-start gap-3">
               <span className="text-lg">
                 {report.is_bankrupt ? '🔴' : '🟢'}
